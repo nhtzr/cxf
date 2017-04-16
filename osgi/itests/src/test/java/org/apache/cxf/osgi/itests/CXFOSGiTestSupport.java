@@ -205,7 +205,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Executes multiple commands inside a Single Session. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param commands
      * @return
      */
@@ -323,7 +323,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Finds a free port starting from the give port numner.
-     * 
+     *
      * @return
      */
     protected int getFreePort(int port) {
@@ -335,7 +335,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Returns true if port is available for use.
-     * 
+     *
      * @param port
      * @return
      */
@@ -401,5 +401,23 @@ public class CXFOSGiTestSupport {
     public void assertBlueprintNamespacePublished(String namespace, int timeout) {
         assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
                                              + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
+    }
+
+    protected InputStream classpath(String path) {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        if (path.startsWith("/")) {
+            return contextClassLoader.getResourceAsStream(path);
+        }
+        final String base = this.getClass().getPackage().getName().replace('.', '/');
+        return contextClassLoader.getResourceAsStream(base + "/" + path);
+    }
+
+    protected Bundle findBundle(String symbolicName) {
+        for (Bundle b : bundleContext.getBundles()) {
+            if (symbolicName.equals(b.getSymbolicName())) {
+                return b;
+            }
+        }
+        throw new RuntimeException("Bundle [" + symbolicName + "] was not found");
     }
 }
